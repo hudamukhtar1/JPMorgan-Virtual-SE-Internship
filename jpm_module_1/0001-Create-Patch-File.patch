@@ -1,0 +1,145 @@
+From dd3cabf3b8fc00d631c57705f6fcf9c711bf2ae9 Mon Sep 17 00:00:00 2001
+From: Huda Mukhtar <hudamukhtar1@gmail.com>
+Date: Mon, 4 May 2020 07:27:15 -0400
+Subject: [PATCH] Create Patch File
+
+---
+ client.py      |  27 ++++++++++++++-------------
+ client.pyc     | Bin 0 -> 1359 bytes
+ client_test.py |  35 ++++++++++++++++++++++++++++++++---
+ 3 files changed, 46 insertions(+), 16 deletions(-)
+ create mode 100644 client.pyc
+
+diff --git a/client.py b/client.py
+index 40badcd..1c7f6e7 100644
+--- a/client.py
++++ b/client.py
+@@ -35,25 +35,26 @@ def getDataPoint(quote):
+ 	stock = quote['stock']
+ 	bid_price = float(quote['top_bid']['price'])
+ 	ask_price = float(quote['top_ask']['price'])
+-	price = bid_price
++	price = (bid_price + ask_price) / 2
+ 	return stock, bid_price, ask_price, price
+ 
+ def getRatio(price_a, price_b):
+-	""" Get ratio of price_a and price_b """
+-	""" ------------- Update this function ------------- """
+-	""" Also create some unit tests for this function in client_test.py """
+-	return 1
++  if (price_b == 0):
++    # when price_b is 0 avoid throwing ZeroDivisionError
++    return
++  return price_a/price_b
+ 
+ # Main
+ if __name__ == "__main__":
++  for _ in xrange(N):
++    quotes = json.loads(urllib2.urlopen(QUERY.format(random.random())).read())
++    prices = {}
++    for quote in quotes:
++      stock, bid_price, ask_price, price = getDataPoint(quote)
++      prices[stock] = price
++      print "Quoted %s at (bid:%s, ask:%s, prive:%s)" % (stock, bid_price, ask_price, price)
+ 
+-	# Query the price once every N seconds.
+-	for _ in xrange(N):
+-		quotes = json.loads(urllib2.urlopen(QUERY.format(random.random())).read())
++    print "Ratio %s" % getRatio(prices['ABC'], prices['DEF'])
++     
+ 
+-		""" ----------- Update to get the ratio --------------- """
+-		for quote in quotes:
+-			stock, bid_price, ask_price, price = getDataPoint(quote)
+-			print "Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price)
+ 
+-		print "Ratio %s" % getRatio(price, price)
+diff --git a/client.pyc b/client.pyc
+new file mode 100644
+index 0000000000000000000000000000000000000000..b54e84047e6a30e6e3d22f356dabfdc7abdd8dbd
+GIT binary patch
+literal 1359
+zcmb_b&2rO75dKC|oY*)J@&ouL4iriiVBkch2<$=voI-GlqENA`ns_?499iRN##B=4
+zoU(7h18|{=7vlzZ=$Y8;7H1?)Pj^puPyc)hzb-azefj)%7t?2+_dj@<MFA-O1PUPi
+z$qS@nrVo$?Gd@HbLa`=-Vtx)P!oTcTgPQZqJZJ%`hQk0=T^xS`)j@MO6WIFe1JVX4
+zz~BN17&Ji<28*B&gAiwMM*IyfPWki_at^(O<89C-_TNN$8B_yZc6RR~q{~QGkgg(K
+z1M#;6TE;`gIV^)#K&wuB5aG)67e^oQMlFE&YzeB4mfIR=ody21hc~6~!d`NL+me6h
+zXUAM;wr}ldqunlaR~CJ3?8bw;5AL>)##Eg=&ei5Wr};N-VV4)?ctyOP@-n+jCO%~A
+zRKT7K0b1O)7H5AN%yiLzx)759lMq+AnQNyJCSt0XM6Qgzq~;=TFo}07t;Su7Wl_ZX
+zAhvyqOCm)oelLqLnb_*MM<rF#vQez0l_Q;(HnuKHV|Dk?IuKYr%Jy^RwWBKU(od~4
+zhk3vji7U;Y9~4^J#QA&iXsj)DSc0uH;V9X81ShfgxzzD7oK@n8*<{l0>mjwPamo3$
+zUzdH7h3%g_$*ra8r7mRI8_OQG2cuy&<T4A&?zOu`PNlswI<ZZT&?CFWCGGl>T-XK^
+zgblIE??usdm(G?S$2C@PI~nH=nLK-7kH^ERwY|hy?l9J-IeOXm!Pk??|MC02ir-br
+z0$<6cbfnGoI`hU27@`?O!n(688_K-QGINuKSFYbGzF}f%<AmG2al_n-xzT>-RNoVG
+z>&7|yh-_*@7XEzl)bCr{&yp)F`*OxrQRMsgtplvhhvb=o(WP}cRI*fh=*Rr(^>*j2
+zbs*U3_|WbLnPykYA!V8OIA#|v#o1-vkHMnM>?%Ft;km#Ex*AIBFRMr@uk%1Mp7jkk
+z9fvWGtd8^PIH3N5ql8tz15B=>hvy)BwB|y_Oq#;KVJ)l$^?H52DOSX7Q4@>enrMht
+F@B@iXC1C&n
+
+literal 0
+HcmV?d00001
+
+diff --git a/client_test.py b/client_test.py
+index a608a01..6c08c82 100644
+--- a/client_test.py
++++ b/client_test.py
+@@ -1,5 +1,6 @@
+ import unittest
+ from client import getDataPoint
++from client import getRatio
+ 
+ class ClientTest(unittest.TestCase):
+   def test_getDataPoint_calculatePrice(self):
+@@ -8,6 +9,8 @@ class ClientTest(unittest.TestCase):
+       {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+     ]
+     """ ------------ Add the assertion below ------------ """
++    for quote in quotes:
++      self.assertEqual(getDataPoint(quote), (quote['stock'], quote['top_bid']['price'], quote['top_ask']['price'], (quote['top_bid']['price'] + quote['top_ask']['price'])/2))
+ 
+   def test_getDataPoint_calculatePriceBidGreaterThanAsk(self):
+     quotes = [
+@@ -15,11 +18,37 @@ class ClientTest(unittest.TestCase):
+       {'top_ask': {'price': 121.68, 'size': 4}, 'timestamp': '2019-02-11 22:06:30.572453', 'top_bid': {'price': 117.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+     ]
+     """ ------------ Add the assertion below ------------ """
+-
++    for quote in quotes:
++      self.assertEqual(getDataPoint(quote), (quote['stock'], quote['top_bid']['price'], quote['top_ask']['price'], (quote['top_bid']['price'] + quote['top_ask']['price'])/2))
+ 
+   """ ------------ Add more unit tests ------------ """
++  # tests for getRatio method
++  def test_getRatio_computeRatio(self):
++    # fake data
++    prices = [ 
++      {'A': 2.00, 'B': 5.00}, {'A': 7.00, 'B': 3.00}, {'A': 9.34, 'B': 7.34}, {'A': 25.76, 'B': 98.75}, {'A': 105.24, 'B': 53.64}
++    ]
++    # assertion to test method
++    for price in prices:
++      self.assertEqual(getRatio(price['A'], price['B']), (price['A']/price['B']))
++  
++  def test_getRatio_computeRatioPriceBZero(self):
++    # fake data
++    prices = [ 
++      {'A': 2.00, 'B': 0}, {'A': 7.00, 'B': 0}, {'A': 9.34, 'B': 0}, {'A': 25.76, 'B': 0}, {'A': 105.24, 'B': 0}
++    ]
++    # assertion to test method
++    for price in prices:
++      self.assertEqual(getRatio(price['A'], price['B']), None)
+ 
+-
+-
++  def test_getRatio_computeRatioPriceAZero(self):
++    # fake data
++    prices = [ 
++      {'A': 0, 'B': 5.00}, {'A': 0, 'B': 3.00}, {'A': 0, 'B': 7.34}, {'A': 0, 'B': 98.75}, {'A': 0, 'B': 53.64}
++    ]
++    # assertion to test method
++    for price in prices:
++      self.assertEqual(getRatio(price['A'], price['B']), 0)
++      
+ if __name__ == '__main__':
+     unittest.main()
+-- 
+2.22.0
+
